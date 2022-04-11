@@ -6,7 +6,7 @@ services:
     container_name: image-server-php
     restart: always
     networks:
-      - elliotjreed-api
+      - image-server
     volumes:
       - ./.env.local:/var/www/html/.env
 
@@ -15,7 +15,7 @@ services:
     container_name: image-server-nginx
     restart: always
     networks:
-      - elliotjreed-api
+      - image-server
       - web
     depends_on:
       - image-server-php
@@ -29,5 +29,5 @@ services:
 networks:
   web:
     external: true
-  elliotjreed-api:
-    name: elliotjreed-api
+  image-server:
+    name: image-server
