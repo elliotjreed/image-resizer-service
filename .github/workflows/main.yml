@@ -35,7 +35,7 @@ jobs:
 #        run: PHP_CS_FIXER_IGNORE_ENV=1 composer run-script phpcs:github-actions | cs2pr --graceful-warnings
 
       - name: Install Composer production dependencies
-        run: APP_ENV=prod composer install --no-interaction --classmap-authoritative --no-progress --no-dev
+        run: APP_ENV=prod APP_DEBUG=0 composer install --no-interaction --classmap-authoritative --no-progress --no-dev
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
