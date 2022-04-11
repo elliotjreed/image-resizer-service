@@ -20,7 +20,6 @@ final class Upload
             } catch (\Exception $exception) {
                 return new JsonResponse(['error' => $exception->getMessage()]);
             }
-
         }
 
         return new JsonResponse(['error' => 'No file was uploaded']);

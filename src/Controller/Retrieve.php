@@ -25,11 +25,7 @@ final class Retrieve
 
         $baseImageFilePath = \realpath(__DIR__ . '/../../public/images/' . $fileName);
 
-        if (!\is_numeric($width) ||
-            !\is_numeric($height) ||
-            !$this->isAcceptableExtension($fileName) ||
-            !\file_exists($baseImageFilePath)
-        ) {
+        if (!\is_numeric($width) || !\is_numeric($height) || !$this->isAcceptableExtension($fileName) || !\file_exists($baseImageFilePath)) {
             throw new NotFoundHttpException();
         }
 
@@ -62,7 +58,7 @@ final class Retrieve
     {
         $extensions = ['.jpg', '.jpeg', '.png'];
         foreach ($extensions as $extension) {
-            if (str_ends_with($fileName, $extension)) {
+            if (\str_ends_with($fileName, $extension)) {
                 return true;
             }
         }
