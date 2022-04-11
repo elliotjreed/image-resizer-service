@@ -1,0 +1,54 @@
+types {
+    application/atom+xml                  atom;
+    application/json                      json map topojson;
+    application/ld+json                   jsonld;
+    application/rss+xml                   rss;
+    application/vnd.geo+json              geojson;
+    application/xml                       rdf xml;
+
+    application/javascript                js;
+
+    application/manifest+json             webmanifest;
+    application/x-web-app-manifest+json   webapp;
+    text/cache-manifest                   appcache;
+
+    audio/mp4                             aac f4a f4b m4a;
+    audio/mpeg                            mp3;
+    image/bmp                             bmp;
+    image/gif                             gif;
+    image/jpeg                            jpeg jpg;
+    image/jxr                             jxr hdp wdp;
+    image/png                             png;
+    image/svg+xml                         svg svgz;
+    image/tiff                            tif tiff;
+    image/webp                            webp;
+    video/mp4                             f4p f4v m4v mp4;
+    video/mpeg                            mpeg mpg;
+    video/ogg                             ogv;
+    video/quicktime                       mov;
+    video/webm                            webm;
+
+    image/x-icon                          cur ico;
+
+    font/woff                             woff;
+    font/woff2                            woff2;
+    font/ttf                              ttf;
+    font/collection                       ttc;
+    font/otf                              otf;
+
+    application/pdf                       pdf;
+    application/postscript                ai eps ps;
+    application/rtf                       rtf;
+
+    application/xhtml+xml                 xhtml;
+    application/xslt+xml                  xsl;
+    application/zip                       zip;
+    text/css                              css;
+    text/csv                              csv;
+    text/html                             htm html shtml;
+    text/markdown                         md;
+    text/mathml                           mml;
+    text/plain                            txt;
+    text/vcard                            vcard vcf;
+    text/vtt                              vtt;
+}

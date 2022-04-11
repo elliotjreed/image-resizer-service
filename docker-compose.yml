@@ -1,0 +1,33 @@
+version: "3.6"
+
+services:
+  image-server-php:
+    image: elliotjreed/image-server-php:latest
+    container_name: image-server-php
+    restart: always
+    networks:
+      - elliotjreed-api
+    volumes:
+      - ./.env.local:/var/www/html/.env
+
+  image-server-nginx:
+    image: elliotjreed/image-server-nginx:latest
+    container_name: image-server-nginx
+    restart: always
+    networks:
+      - elliotjreed-api
+      - web
+    depends_on:
+      - image-server-php
+    labels:
+      - "traefik.docker.network=web"
+      - "traefik.enable=true"
+      - "traefik.frontend.rule=Host:images.elliotjreed.com"
+      - "traefik.protocol=h2c"
+      - "traefik.port=97"
+
+networks:
+  web:
+    external: true
+  elliotjreed-api:
+    name: elliotjreed-api
