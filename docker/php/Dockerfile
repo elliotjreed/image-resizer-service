@@ -10,11 +10,10 @@ COPY ./docker/php/php-ini-overrides.ini /usr/local/etc/php/conf.d/99-overrides.i
 COPY ./docker/php/fpm.conf /usr/local/etc/php-fpm.conf
 
 USER root
-RUN apk add --no-cache imagemagick && \
-    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS imagemagick imagemagick-dev && \
-    docker-php-ext-install iconv && \
-    pecl install redis && docker-php-ext-enable redis && \
-    pecl install -o -f imagick &&  docker-php-ext-enable imagick && \
+RUN apk add --no-cache imagemagick imagemagick-dev && \
+    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS && \
+    pecl install -o -f imagick && \
+    docker-php-ext-enable imagick && \
     apk del .build-deps
 
 RUN chown -R www-data:www-data /var/www/html && \
