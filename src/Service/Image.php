@@ -4,76 +4,74 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Exception\DimensionLimitExceeded;
+use App\Exception\InvalidDimensions;
+use App\Exception\UnsupportedFileType;
 use Imagick;
+use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
+use Symfony\Component\HttpFoundation\File\File;
 
 final class Image
 {
-    public function __construct()
+    public function get(string $fileName, string $dimensions, bool $bestFit = false): string
     {
-    }
+        $this->validateDimensions($dimensions);
 
-    public function get(string $fileName, string $dimensions): string
-    {
-        list($width, $height) = \explode('x', \strtolower($dimensions));
+        $baseImageFilePath = __DIR__ . '/../../public/images/' . $fileName;
+        try {
+            $baseImageFile = new File($baseImageFilePath, checkPath: true);
+        } catch (FileNotFoundException) {
+            throw new \Exception($baseImageFilePath);
+        }
 
-        $baseImageFilePath = \realpath(__DIR__ . '/../../public/images/' . $fileName);
-
-        $this->validate($baseImageFilePath, $width, $height, $fileName);
+        $extension = $baseImageFile->guessExtension();
+        if (!\in_array($extension, ['jpg', 'jpeg', 'png'])) {
+            throw new UnsupportedFileType($extension);
+        }
 
         $resizedImageDirectory = __DIR__ . '/../../public/images/' . \strtolower($dimensions);
 
         $resizedFileName = $resizedImageDirectory . '/' . $fileName;
+        $resizedFile = new File($resizedImageDirectory . '/' . $fileName, checkPath: false);
 
-        if (\file_exists($resizedFileName)) {
-            $file = new \SplFileObject($resizedFileName);
-
-            return $file->fread($file->getSize());
+        if ($resizedFile->isFile()) {
+            return $resizedFile->getContent();
         }
 
         if (!\is_dir($resizedImageDirectory)) {
-            \mkdir($resizedImageDirectory, 0777);
+            \mkdir($resizedImageDirectory, 0775);
         }
 
-        $imagick = new Imagick($baseImageFilePath);
-        $imagick->scaleImage((int) $width, (int) $height);
+        $imagick = new Imagick($baseImageFile->getRealPath());
+
+        list($width, $height) = \explode('x', \strtolower($dimensions));
+        $imagick->scaleImage((int) $width, (int) $height, $bestFit);
         $imagick->writeImage($resizedFileName);
+
+        \chmod(\realpath($resizedFileName), 0644);
 
         return $imagick->getImageBlob();
     }
 
-    private function isAcceptableExtension(string $fileName): bool
+    private function validateDimensions(string $dimensions): void
     {
-        $extensions = ['.jpg', '.jpeg', '.png'];
-        foreach ($extensions as $extension) {
-            if (\str_ends_with($fileName, $extension)) {
-                return true;
-            }
-        }
+        list($width, $height) = \explode('x', \strtolower($dimensions));
 
-        return false;
-    }
-
-    private function dimensionsAreNumeric(string $width, string $height): bool
-    {
-        return \is_numeric($width) && \is_numeric($height);
-    }
-
-    private function validate(bool|string $baseImageFilePath, string $width, string $height, string $fileName): void
-    {
-        if (!$baseImageFilePath) {
-            throw new \Exception('Base image does not exist');
-        }
-
-        if ($this->dimensionsAreNumeric($width, $height)) {
-            throw new \Exception('Invalid dimensions format, must be in the format 123x456');
-        }
-
-        if (!$this->isAcceptableExtension($fileName)) {
-            throw new \Exception('Requested image must be a JPEG or a PNG');
+        if (!$this->dimensionsAreNumeric($width, $height)) {
+            throw new InvalidDimensions($dimensions);
         }
 
         if ($width > 5000 || $height > 5000) {
-            throw new \Exception('The maximum allowed dimensions are 5000x5000');
+            throw new DimensionLimitExceeded($dimensions);
         }
+
+        if ($width < 1 || $height < 1) {
+            throw new InvalidDimensions($dimensions);
+        }
+    }
+
+    private function dimensionsAreNumeric(mixed $width, mixed $height): bool
+    {
+        return \is_numeric($width) && \is_numeric($height);
     }
 }
